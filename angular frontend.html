@@ -1,0 +1,73 @@
+----------------Angular Frontend----------------------------------------
+
+<!DOCTYPE html>
+<html lang="en" ng-app="todoApp">
+<head>
+  <meta charset="UTF-8" />
+  <title>MEAN Todo List</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.3/angular.min.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 500px; margin: 50px auto; background: #f4f6f8; }
+    h1 { text-align: center; color: #333; }
+    .box { background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    input { width: 70%; padding: 8px; }
+    button { padding: 8px 14px; margin-left: 5px; cursor: pointer; }
+    ul { list-style: none; padding: 0; }
+    li { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #eee; }
+    .completed { text-decoration: line-through; color: gray; }
+  </style>
+</head>
+<body ng-controller="TodoController as vm">
+  <div class="box">
+    <h1>📝 Todo List</h1>
+    <form ng-submit="vm.addTodo()">
+      <input type="text" ng-model="vm.newTodo" placeholder="Add a new task..." required />
+      <button type="submit">Add</button>
+    </form>
+    <ul>
+      <li ng-repeat="todo in vm.todos">
+        <span ng-class="{completed: todo.completed}" ng-click="vm.toggleTodo(todo)">
+          {{ todo.text }}
+        </span>
+        <button ng-click="vm.deleteTodo(todo)">❌</button>
+      </li>
+    </ul>
+  </div>
+
+  <script>
+    angular.module("todoApp", [])
+      .controller("TodoController", function ($http) {
+        const vm = this;
+        vm.todos = [];
+        vm.newTodo = "";
+
+        function loadTodos() {
+          $http.get("/api/todos").then((res) => (vm.todos = res.data));
+        }
+
+        vm.addTodo = function () {
+          if (!vm.newTodo.trim()) return;
+          $http.post("/api/todos", { text: vm.newTodo }).then((res) => {
+            vm.todos.unshift(res.data);
+            vm.newTodo = "";
+          });
+        };
+
+        vm.toggleTodo = function (todo) {
+          $http.put("/api/todos/" + todo._id, { completed: !todo.completed })
+            .then((res) => (todo.completed = res.data.completed));
+        };
+
+        vm.deleteTodo = function (todo) {
+          $http.delete("/api/todos/" + todo._id).then(() => {
+            vm.todos = vm.todos.filter((t) => t._id !== todo._id);
+          });
+        };
+
+        loadTodos();
+      });
+  </script>
+</body>
+</html>
+
+--------------------------------------
