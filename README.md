@@ -203,8 +203,7 @@ This project demonstrates:
 
 - B.Tech CSE (Data Science)
 - Lovely Professional University
-- GitHub: https://github.com/your-username
-- LinkedIn: https://linkedin.com/in/your-profile
+
 
 ---
 
